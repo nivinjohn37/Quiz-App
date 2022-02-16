@@ -1,1 +1,4 @@
 -sass mixin
+-snippets in vs code
+-[...] spread operator full copies the data from the array.
+-eventlistener
