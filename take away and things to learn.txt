@@ -2,3 +2,9 @@
 -snippets in vs code
 -[...] spread operator full copies the data from the array.
 -eventlistener
+-object transformation
+-public api fetch process
+-<p class="choice-text" data-number="2"></p>
+-loader
+-progress bar
+-localstorage

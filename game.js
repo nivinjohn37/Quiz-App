@@ -3,6 +3,8 @@ const choices = Array.from(document.getElementsByClassName("choice-text"));
 const progressText = document.getElementById("progressText");
 const scoreText = document.getElementById("score");
 const progressBarFull = document.getElementById("progressBarFull");
+const loader = document.getElementById("loader");
+const game = document.getElementById("game");
 
 let currentQuestion = {};
 let acceptingAnswers = false;
@@ -10,25 +12,39 @@ let score = 0;
 let questionCounter = 0;
 let availableQuestions = [];
 let questions = [];
-fetch("https://opentdb.com/api.php?amount=10&category=9&difficulty=medium&type=multiple").then(res =>{
-  return res.json();
-}).then(loadedQuestions =>{
-  loadedQuestions.results.map(loadedQuestion =>{
-    const formattedQuestion = {
-      question:loadedQuestion.questions,
-    };
-    const answerChoices = [...loadedQuestion.incorrect_answers];
-    formattedQuestion.answer =Math.f
+fetch(
+  "https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple"
+)
+  .then((res) => {
+    return res.json();
+  })
+  .then((loadedQuestions) => {
+    questions = loadedQuestions.results.map((loadedQuestion) => {
+      const formattedQuestion = {
+        question: loadedQuestion.question,
+      };
+      const answerChoices = [...loadedQuestion.incorrect_answers];
+      formattedQuestion.answer = Math.floor(Math.random() * 3) + 1;
+      answerChoices.splice(
+        formattedQuestion.answer - 1,
+        0,
+        loadedQuestion.correct_answer
+      );
+
+      answerChoices.forEach((choice, index) => {
+        formattedQuestion["choice" + (index + 1)] = choice;
+      });
+      return formattedQuestion;
+    });
+    startGame();
+  })
+  .catch((err) => {
+    console.error(err);
   });
-  questions = loadedQuestions;
-  startGame();
-}).catch(err =>{
-  console.error(err);
-});
 
 //CONSTANTS
 const CORRECT_BONUS = 10;
-const MAX_QUESTIONS = 3;
+const MAX_QUESTIONS = 5;
 
 startGame = () => {
   questionCounter = 0;
@@ -37,6 +53,8 @@ startGame = () => {
   //https://youtu.be/zZdQGs62cR8?list=PLDlWc9AfQBfZIkdVaOQXi1tizJeNJipEx&t=486
   availableQuestions = [...questions];
   getNewQuestion();
+  game.classList.remove("hidden");
+  loader.classList.add("hidden");
 };
 
 getNewQuestion = () => {
@@ -48,7 +66,7 @@ getNewQuestion = () => {
   questionCounter++;
   //questionCounterText.innerText = questionCounter+"/"+MAX_QUESTIONS;
   progressText.innerText = `Question ${questionCounter}/${MAX_QUESTIONS}`;
- 
+
   //update the progress bar
   progressBarFull.style.width = `${(questionCounter / MAX_QUESTIONS) * 100}%`;
   const questionIndex = Math.floor(Math.random() * availableQuestions.length);
@@ -78,7 +96,7 @@ choices.forEach((choice) => {
     }
 
     if (classToApply === "correct") {
-      incrementScore()
+      incrementScore();
     }
 
     selectedChoice.parentElement.classList.add(classToApply);
